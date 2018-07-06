@@ -1,0 +1,49 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html>
+<head>
+<title>Panorama Viewer</title>
+<!-- this uses dynapi http://dynapi.sourceforge.net -->
+<!-- you have to change the paths below to point to where dynapi source is -->
+<!-- on your server -->
+<LINK REL="stylesheet" HREF="http://www.cyberus.ca/~rbrooks/pagestyle.css" TYPE="text/css">
+<Script language="Javascript" src="http://www.cim.mcgill.ca/~rbrook/dynapi/src/dynapi.js"></script>
+<Script language="Javascript" src="panorama.js"></script>
+<Script language="Javascript"> 
+
+	DynAPI.setLibraryPath('http://www.cim.mcgill.ca/~rbrook/dynapi/src/lib/')
+	DynAPI.include('dynapi.api.*')
+	DynAPI.include('dynapi.event.*')
+        panimage1=new Image();
+        panimage1.src="sinewave.png";
+</script>
+<Script language="Javascript">
+
+DynAPI.onLoad=function() {
+   buildPanorama('target1',panimage1,1)
+}
+</script>
+</head>
+<body>
+<Table WIDTH=500><TR><TD><CENTER>
+    <H2>
+Javascript Panorama Viewer</H2>
+ <img name="target1" src="sineview.png" HEIGHT=159 WIDTH=200>
+<P STYLE="font-size: x-small; font-style: italic" >
+Click and drag to change point of view
+    </P>
+<P>This sinewave image shows an example of how the panorama viewer can work</P>
+
+<hr>
+
+
+<P STYLE="font-size: x-small">
+Javascript Panorama Viewer by
+	  Rupert Brooks<BR>
+	  Source code is downloadable from my <A HREF="http://www.cyberus.ca/~rbrooks/code.html">code</A> download page.<BR>
+
+<!-- hhmts start -->
+Last modified: Thu Jan 15 19:32:45 EST 2004
+<!-- hhmts end -->
+</P></CENTER>
+</TD></TR></Table>
+</body> </html>

@@ -1,0 +1,257 @@
+<!DOCTYPE HTML PUBLIC "-//IETF//DTD HTML//EN">
+<html> <head>
+<title>Pointy: A tool for editing matched points on images</title>
+<style>pre { color: #883300 }</style>
+</head>
+
+<body>
+<CENTER>
+<TABLE WIDTH=950>
+<TR>
+<TD>
+<h1>Pointy: A tool for editing matched points on images</h1>
+
+Pointy is a simple viewing and editing system for sets of matched points
+on pairs of images.  It allows the viewing and editing of lists of 
+matched x, y points, lists of sift points, and lists of affine point pairs.
+Pointy also allows visualization of the transformation defined by a homography 
+matrix, and the epipolar lines implied by a fundamental matrix.
+<P />
+Pointy is somewhat limited, and it would be ideal to rewrite it in QT, or
+Java, or just about anything else besides TCL, but I never find the time. 
+Despite its limitations
+it has proved pretty useful, and I hope you find it useful too.  Please 
+send bug reports, or ideally bug fixes, comments, etc to rupert at rupertbrooks dot ca.
+
+<h2>Obtaining Pointy</h2>
+Download a zip archive from 
+<A HREF="http://www.rupertbrooks.ca/pointy/downloads">here</A>, or check 
+it out from the
+svn repository. <A HREF="http://svn.assembla.com/svn/pointy/">http://svn.assembla.com/svn/pointy/</A>
+(Rather than browsing this link, put this url in your
+subversion client.)
+
+<h3>License</h3>
+Pointy is so simple, it almost seems pointless to license it.  Nevertheless, 
+Pointy is licensed under the Mozilla Public License 
+(<A HREF="http://www.mozilla.org/MPL/">http://www.mozilla.org/MPL/</A>)
+Briefly, this means that:
+<UL>
+<LI> You may freely modify, use and distribute the software, but
+<LI> such modifications must be open sourced, and clearly identified.
+<LI> However, you may combine the software with other work, in which case only 
+this software must be
+kept open source, but the other work can be licensed however you wish.
+<LI> There is no warranty.
+</UL>
+
+<h2>Installation and Usage</h2>
+Pointy is implemented as a single <A HREF="http://www.tcl.tk">Tcl/Tk</A> 
+script.  Thus, on any system supporting Tcl/Tk, it can be started in the 
+normal way for such a script.  Examples follow, but your system may
+be different
+
+<OL>
+<LI>Linux: </LI>
+The <A HREF="http://en.wikipedia.org/wiki/Shebang_(Unix)">shebang</A> line
+at the top of the script should enable your shell
+to associate the Tcl/Tk interpreter (wish) with pointy.  Then pointy.tcl should
+be placed in your path, and may be started at the command line by typing 
+<P />
+<PRE>
+      pointy.tcl
+</PRE>
+<P />
+<LI>Windows: </LI> If a system such as Active Tcl is installed, files with the
+.tcl extension may be associated with the TclTk interpreter, and may be made
+executable by adding .tcl to the PATHEXT environment variable.  Then pointy.tcl
+may be placed in your path and started from the command line as above.
+
+<LI>Cygwin and Active TCL: </LI> Only try this approach if the previous two approaches
+don't work for you.  On my own system, I have both cygwin and activeTCL 
+installed, and I prefer to run pointy from the cygwin bash prompt with 
+the activeTCL interpreter rather
+than the cygwin one.   This can only be achieved by taking the cygwin paths
+OUT of the system path before starting pointy. I achieve this using a 
+small bash script called pointy which contains the following.
+<P /><pre>
+      #!/bin/bash
+      SCRIPTPATHWIN=$(cygpath -m "$(which pointy.tcl)" )
+      export PATH=`stripout.pl PATH '^/usr' '^/bin'`
+      #echo "$SCRIPTPATHWIN"
+      wish "$SCRIPTPATHWIN" $*
+</pre><P />
+
+stripout.pl is a perl script containing the following.
+<P />
+<pre>
+      #!perl
+      $var=$ENV{$ARGV[0]};
+      @vararray=split(/:/,$var);
+      for($i=1;$i&lt;=$#ARGV;$i++) {
+          for($j=0;$j&lt;$#vararray;$j++) {
+             if($vararray[$j]=~/$ARGV[$i]/) {
+                # drop this item from the list
+                #print "Dropping $vararray[$j]\n";
+                splice(@vararray,$j,1);
+                #print "$j now $vararray[$j]\n";
+                $j--;
+             }
+          }
+      }
+      print join(":",@vararray),"\n";
+</pre>
+<P />
+This type of approach may work for you if you have multiple installations of 
+things that interfere with each other.
+
+<LI>Last resort: </LI> You can also always call the TclTk interpreter and pass 
+the pointy script as an argument.  For example
+<P />
+<pre>
+      wish [path/to/pointy/pointy.tcl] {arguments....}
+</pre>
+</OL>
+
+However you start it, pointy takes the names of two images on the command line
+<P />
+<pre>
+      pointy leftimage rightimage
+</pre>
+<P />
+Starting pointy in this way brings up the interface with the left image on 
+the left, and the right image on the right.  Which brings us to...
+
+<h2>Using Pointy</h2>
+<H3>Overview</H3>
+Pointy has three modes which can be selected in the selection
+bar on the left of the Pointy window.  In "Add points" matched pairs of points can be added
+to the current set.  In "Show H" the correspondence between the images implied 
+by a homography matrix can be viewed interactively.  In "Show F", the epipolar
+lines in one image corresponding to a point in the other can be viewed interactively.
+
+A point consists of a centroid, and a surrounding, oriented ellipse.  Both the center
+position and surround characteristics can be changed interactively.  Points are added
+by left clicking, and manipulated by moving the mouse over a point to select it, and
+then left, right, or middle clicking and dragging.
+
+<UL>
+<LI> Add a point.  Left Click
+<LI> Move a point.  Left Click and drag
+<LI> Change size and orientation of surround. Right Click and drag.
+<LI> Change eccentricity of ellipse.  Center-click and drag.
+<LI> Delete a point.  While mouse is over it, press "delete".
+</UL>
+
+
+<H3>Examples</H3>
+The use of Pointy will be demonstrated via a number of examples.  These are 
+contained in the Examples subdirectory of the distribution.  Since this 
+manual is in the same directory, presumably you found it.  Throughout these
+examples, it is assumed that you are working in the Examples directory.
+
+
+<H3>Example 1: Hong Kong: Adding simple point matches.</H3>
+First, let us load up two images with the following command
+<P>
+<PRE>
+      C:\home\development\pointy\Examples>pointy hongkong/hk1a.png hongkong/hk2a.png
+</PRE>
+<P>
+This should pop up the pointy window, with both images at least partly shown.
+
+<BR /><CENTER><IMG SRC="PointyManualImages/hk01a-0.png"></CENTER><BR />
+
+Now go to the file menu, and select "Load Plain matches".  Navigate to the file
+hongkong/hkpoints.dat.  This will load up 4 matched point pairs.  The hkpoints.dat
+file simply contains lines which have the x, y pixel positions in the left image, followed
+by the right image.  (Note that x is the columns, and y is zero at the top of the image.)
+
+<P /><CENTER><IMG SRC="PointyManualImages/hk02a-0.png"></CENTER><P />
+
+<H3>Example 2: Hong Kong: Adding simple point matches.</H3>
+Four point pairs is not really enough to do much image matching work.  Lets add a few more.
+Make sure that Pointy is in "Add Points" mode, based on the radio buttons on the far left
+of the window.  Now left-click in either image frame.  This will create a new point pair - 
+but note that the matched point in the other image is not in the right place.  Move the mouse 
+over that point, and it will turn green.  Once green, you can left click and drag it where you
+want it.  To remove a point move the mouse over it so it turns green, and press the delete key.
+<P /><CENTER><IMG SRC="PointyManualImages/hk03a-0.png"></CENTER><P />
+
+Once you have added more points to your satisfaction, on the file menu select "Save Plain matches"
+to save them to a text file.
+<P />
+Matched points frequently have more information on the matched region than just the center
+point.  Pointy allows you to edit the oriented ellipse that surrounds each point. Right-clicking and 
+dragging changes the size and orientation of the surrounding region.  You can stretch the 
+point into an ellipse using the middle button and dragging..  If you save the point as an 
+affine point
+the ellipse information is kept.  If you save it as a sift point, only the size and orientation
+(ie, an oriented circle) is kept.  Finally if you save it as a plain point, only the 
+centroid is kept.
+<P /><CENTER><IMG SRC="PointyManualImages/hk05a-0.png"></CENTER><P />
+
+
+<H3>Example 3: Hong Kong: Viewing a homography.</H3>
+
+Pointy can also display the transformation implied by a homography image between
+two images.  To see this, either continue from the above example, or load the hongkong
+images again.  Under the file menu, select "Load H".  On the left sidebar, select Show H.
+Now when you move the mouse over either of the images, a little pink cursor will follow it,
+and a similar cursor will appear in the other image.  The position of the cursor in
+the other image is determined by the homography transformation.  Try moving one the mouse around
+one of the large buildings.  The cursor should closely follow the corresponding position
+in the other image.
+<P /><CENTER><IMG SRC="PointyManualImages/hk04a-0.png"></CENTER><P />
+
+
+<H3>Example 4: Shed: Sift keypoints</H3>
+
+Pointy can also display scale invariant and affine invariant points.  Such points have extra
+parameters in addition to the x and y coordinates of the point centers.  These extra 
+parameters indicate the corresponding region of the image around each point.  In the case
+of sift points, a scale and angle are provided.  Start pointy using the "shed" example
+<P />
+<PRE>
+      pointy shed\img_1596.pgm shed\img_1597.pgm
+</PRE>
+<P />
+Now go to the file menu, select "Load Sift points" and navigate to the shed/img_1596_1597.sift
+file.  You should see many points with circles of different sizes and different orientations. 
+Move your mouse over a particular circle to highlight the matched pair in each image.
+<P /><CENTER><IMG SRC="PointyManualImages/shed01a-0.png"></CENTER><P />
+
+
+
+
+<H3>Example 5: Shed: Viewing epipolar lines</H3>
+
+A fundamental matrix defines the geometric relationship between two cameras.  A point in one image
+maps to a line in the other image.  This can be visualized using Pointy.  With the shed
+images loaded as above, open the file menu, and select "Load FM".  Select the file
+shed/img_1596_to_1597.F.  On the selection bar at the left of Pointy, choose "Show F".
+Now, when you move your cursor in one image, the epipolar line implied by this fundamental matrix
+appears in the other image.
+<P /><CENTER><IMG SRC="PointyManualImages/shed02a-0.png"></CENTER><P />
+
+
+
+<H2>Known bugs and todo list</H2>
+These are current limitations of this program.  
+<UL>
+<LI> Does not support magnification or scaling of the images.  This is because the
+canvas widget does not (easily) support magification or scaling.
+<LI> Currently does not allow loading images from the menu.  They must be specified
+on the command line.
+<LI> Currently saving affine points is not implemented
+</UL>
+<hr>
+<address><a href="http://www.rupertbrooks.ca">Rupert Brooks &lt;rupe at rupert brooks dot ca&gt;</a></address>
+<!-- hhmts start -->
+Last modified: Sun Feb  1 12:38:42 EST 2009
+<!-- hhmts end -->
+</TD>
+</TR>
+</TABLE>
+</CENTER>
+</body> </html>
